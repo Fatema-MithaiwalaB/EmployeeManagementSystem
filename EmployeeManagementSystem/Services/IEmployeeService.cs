@@ -1,13 +1,14 @@
-﻿using EmployeeManagementSystem.Models;
+﻿using EmployeeManagementSystem.DTOs;
+using EmployeeManagementSystem.Models;
+using System.Security.Claims;
 
-namespace EmployeeManagementSystem.Services
+public interface IEmployeeService
 {
-    public interface IEmployeeService
-    {
-        Task<IEnumerable<Employee>> GetAllEmployeesAsync();
-        Task<Employee?> GetEmployeeByIdAsync(int id);
-        Task<Employee> AddEmployeeAsync(Employee employee);
-        Task<bool> UpdateEmployeeAsync(int id, Employee employee);
-        Task<bool> DeleteEmployeeAsync(int id);
-    }
+    Task<string> CreateEmployeeAsync(EmployeeRegisterDTO dto);
+    Task<Employee?> GetEmployeeByIdAsync(int id, ClaimsPrincipal user);
+    Task<string> UpdateEmployeeAsync(int id, EmployeeRegisterDTO dto, ClaimsPrincipal user);
+    Task<string> DeleteEmployeeAsync(int id);
+    Task<IEnumerable<Employee>> GetAllEmployeesAsync();
+    Task<string> RegisterAsync(EmployeeRegisterDTO dto);
+    Task<EmployeeResponseDTO?> LoginAsync(EmployeeLoginDTO dto);
 }

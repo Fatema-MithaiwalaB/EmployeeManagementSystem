@@ -20,10 +20,13 @@ namespace EmployeeManagementSystem.Models
         public string Address { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public bool isDeleted { get; set; } = false;
 
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
         public ICollection<Timesheet> Timesheets { get; set; } = new List<Timesheet>();
         public ICollection<Leave> Leaves { get; set; } = new List<Leave>();
+        public string? ResetToken { get; set; }  // Nullable
+        public DateTime? ResetTokenExpiry { get; set; }
     }
 }
