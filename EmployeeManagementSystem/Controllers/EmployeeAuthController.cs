@@ -27,6 +27,8 @@ namespace EmployeeManagementSystem.Controllers
             {
                 return BadRequest(new { message = "Email already in use" });
             }
+            if (dto.RoleId == 2)
+                return BadRequest(new { message = "Please use role id as 1." });
 
             var employee = new Employee
             {
@@ -40,6 +42,9 @@ namespace EmployeeManagementSystem.Controllers
                 RoleId = dto.RoleId,
                 PasswordHash = PasswordHasher.HashPassword(dto.Password)
             };
+
+            if (employee.RoleId == 2)
+                return BadRequest(new { message = "Please use role id as 1." });
 
             await _employeeRepository.AddAsync(employee);
 

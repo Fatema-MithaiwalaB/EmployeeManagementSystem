@@ -33,7 +33,7 @@ namespace EmployeeManagementSystem.Repositories
 
         public async Task UpdateAsync(Employee employee)
         {
-            var existingEmployee = await _context.Employees.AsNoTracking().FirstOrDefaultAsync(e => e.EmployeeId == employee.EmployeeId);
+            var existingEmployee = await _context.Employees.FindAsync(employee.EmployeeId);
 
             if (existingEmployee == null)
             {
@@ -41,26 +41,20 @@ namespace EmployeeManagementSystem.Repositories
                 return;
             }
 
-            // Log the old and new email
-            _logger.LogInformation($"Existing Email: {existingEmployee.Email}, New Email: {employee.Email}");
+            // ✅ Update properties manually
+            existingEmployee.FirstName = employee.FirstName;
+            existingEmployee.LastName = employee.LastName;
+            existingEmployee.Email = employee.Email;
+            existingEmployee.Phone = employee.Phone;
+            existingEmployee.TechStack = employee.TechStack;
+            existingEmployee.Address = employee.Address;
+            existingEmployee.DepartmentId = employee.DepartmentId;
 
-            // Check if any property has actually changed
-            if (existingEmployee.Email == employee.Email &&
-                existingEmployee.FirstName == employee.FirstName &&
-                existingEmployee.LastName == employee.LastName &&
-                existingEmployee.Phone == employee.Phone &&
-                existingEmployee.TechStack == employee.TechStack &&
-                existingEmployee.Address == employee.Address &&
-                existingEmployee.DepartmentId == employee.DepartmentId)
-            {
-                _logger.LogWarning($"No changes detected for Employee ID {employee.EmployeeId}. Update skipped.");
-                return;
-            }
+            _context.Employees.Attach(existingEmployee);
+            _context.Entry(existingEmployee).State = EntityState.Modified;  // ✅ Mark entity as modified
 
-            _context.Employees.Update(employee);
             int changes = await _context.SaveChangesAsync();
-
-            _logger.LogInformation($"Rows affected: {changes} for Employee ID {employee.EmployeeId}");
+            _logger.LogInformation($"Employee updated successfully. Rows affected: {changes}");
         }
 
     }

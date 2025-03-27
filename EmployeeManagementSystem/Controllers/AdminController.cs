@@ -24,14 +24,23 @@ namespace EmployeeManagementSystem.Controllers
             _logger = logger;
         }
 
-        // ✅ Create Admin
+        // Create Admin
         [HttpPost("create-admin")]
-        public async Task<IActionResult> CreateAdmin(AdminRegisterDTO dto)
+        public async Task<IActionResult> CreateAdmin([FromBody] AdminRegisterDTO dto)
         {
             try
             {
+                if (dto == null)
+                    return BadRequest(new { message = "Invalid request data." });
+
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 if (await _adminRepository.GetAdminByEmailAsync(dto.Email) != null)
                     return BadRequest(new { message = "Admin with this email already exists." });
+
+                if (dto.RoleId == 1)
+                    return BadRequest(new { message = "You are trying to create an Employee in Admin login. Please use role ID = 2." });
 
                 var admin = new Admin
                 {
@@ -45,16 +54,17 @@ namespace EmployeeManagementSystem.Controllers
                 };
 
                 await _adminRepository.AddAdminAsync(admin);
+                await _adminRepository.SaveChangesAsync(); // Ensure this is called
+
                 return Ok(new { message = "Admin created successfully" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating admin.");
-                return StatusCode(500, new { message = "An error occurred while creating the admin." });
+                _logger.LogError(ex, $"Error creating admin: {ex.Message}");
+                return StatusCode(500, new { message = $"An error occurred while creating the admin: {ex.Message}" });
             }
         }
 
-        // ✅ Get All Active Admins
         [HttpGet("all-admins")]
         public async Task<IActionResult> GetAllAdmins()
         {
@@ -81,7 +91,6 @@ namespace EmployeeManagementSystem.Controllers
             }
         }
 
-        // ✅ Get Admin by ID
         [HttpGet("admin/{id}")]
         public async Task<IActionResult> GetAdmin(int id)
         {
@@ -107,7 +116,7 @@ namespace EmployeeManagementSystem.Controllers
             }
         }
 
-        // ✅ Update Admin (Only Self-Update Allowed)
+        
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateAdmin(int id, [FromBody] AdminRegisterDTO dto)
         {
@@ -121,9 +130,17 @@ namespace EmployeeManagementSystem.Controllers
                 if (loggedInAdminId != id)
                     return Forbid();
 
+                var existingAdmin = await _adminRepository.GetAdminByEmailAsync(dto.Email);
+                if (existingAdmin != null && existingAdmin.AdminId != id)
+                {
+                    return BadRequest(new { message = "Admin with this email already exists." });
+                }
+
+
                 admin.FirstName = dto.FirstName;
                 admin.LastName = dto.LastName;
                 admin.Phone = dto.Phone;
+                admin.Email = dto.Email;
 
                 _adminRepository.UpdateAdmin(admin);
                 await _adminRepository.SaveChangesAsync();
@@ -137,7 +154,6 @@ namespace EmployeeManagementSystem.Controllers
             }
         }
 
-        // ✅ Soft Delete Admin
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> SoftDeleteAdmin(int id)
         {

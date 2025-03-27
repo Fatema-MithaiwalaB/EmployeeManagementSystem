@@ -13,3 +13,4 @@ namespace EmployeeManagementSystem.Repositories
         Task<IEnumerable<Admin>> GetAllAdminsAsync();
     }
 }
+

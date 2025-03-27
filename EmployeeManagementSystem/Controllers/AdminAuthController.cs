@@ -28,6 +28,9 @@ namespace EmployeeManagementSystem.Controllers
             if (existingAdmin != null)
                 return BadRequest("Admin already exists.");
 
+            if (dto.RoleId == 1)
+                return BadRequest(new { message = "Please use role id as 2." });
+
             var admin = new Admin
             {
                 FirstName = dto.FirstName,

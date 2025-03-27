@@ -26,5 +26,7 @@ namespace EmployeeManagementSystem.Models
         public Department Department { get; set; }
         public ICollection<Timesheet> Timesheets { get; set; } = new List<Timesheet>();
         public ICollection<Leave> Leaves { get; set; } = new List<Leave>();
+        public string? ResetToken { get; set; }  // Nullable
+        public DateTime? ResetTokenExpiry { get; set; }
     }
 }

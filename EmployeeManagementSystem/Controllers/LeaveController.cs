@@ -47,17 +47,34 @@ namespace EmployeeManagementSystem.Controllers
         public async Task<IActionResult> GetLeaveById(int id)
         {
             var leave = await _leaveService.GetLeaveByIdAsync(id);
+
             if (leave == null) return NotFound();
+
+            var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            if (userRole == "Admin")
+                return Ok(leave);
+
+            if (leave.EmployeeId != loggedInUserId)
+                return Forbid();
+
             return Ok(leave);
         }
+
 
         [HttpPut("UpdateLeaveStatus/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateLeaveStatus(int id, [FromBody] string status)
         {
             var result = await _leaveService.UpdateLeaveStatusAsync(id, status);
-            return result ? Ok() : NotFound();
+
+            if (!result)
+                return NotFound(new { message = "Leave request not found or could not be updated." });
+
+            return Ok(new { message = "Leave status updated successfully." });
         }
+
 
         [HttpDelete("DeleteLeave/{id}")]
         public async Task<IActionResult> DeleteLeave(int id)
@@ -67,6 +84,13 @@ namespace EmployeeManagementSystem.Controllers
                 var leave = await _leaveService.GetLeaveByIdAsync(id);
                 if (leave == null)
                     return NotFound(new { message = "Leave request not found." });
+
+                var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+                // Only allow the employee who requested it or an admin to delete
+                if (userRole != "Admin" && leave.EmployeeId != loggedInUserId)
+                    return Forbid();
 
                 if (leave.Status != "Pending")
                     return BadRequest(new { message = "Cannot delete a leave request that has already been processed." });
@@ -83,9 +107,6 @@ namespace EmployeeManagementSystem.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the leave request." });
             }
         }
-
-
-
 
         [Authorize(Roles = "Admin")]
         [HttpGet("GetPendingLeaves")]
@@ -113,6 +134,12 @@ namespace EmployeeManagementSystem.Controllers
             if (employee == null)
                 return NotFound(new { message = "Employee not found." });
 
+            var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            if (userRole != "Admin" && loggedInUserId != employeeId)
+                return Forbid();
+
             var leaves = await _leaveService.GetLeavesByEmployeeIdAsync(employeeId);
 
             if (!leaves.Any())
@@ -120,6 +147,7 @@ namespace EmployeeManagementSystem.Controllers
 
             return Ok(leaves);
         }
+
 
 
     }
