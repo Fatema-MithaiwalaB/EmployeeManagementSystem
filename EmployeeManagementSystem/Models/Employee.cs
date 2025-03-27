@@ -20,6 +20,7 @@ namespace EmployeeManagementSystem.Models
         public string Address { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public bool isDeleted { get; set; } = false;
 
         public int DepartmentId { get; set; }
         public Department Department { get; set; }

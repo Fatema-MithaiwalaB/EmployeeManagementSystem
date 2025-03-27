@@ -2,7 +2,7 @@
 
 namespace EmployeeManagementSystem.DTOs
 {
-    public class EmployeeRegisterDTO
+    public class AdminRegisterDTO
     {
         [Required]
         public string FirstName { get; set; }
@@ -19,13 +19,7 @@ namespace EmployeeManagementSystem.DTOs
         [Required]
         public string Phone { get; set; }
 
-        public string TechStack { get; set; }
-        public string Address { get; set; }
-
         [Required]
-        public int DepartmentId { get; set; }
-
-        [Required]
-        public int RoleId { get; set; } // 1 = Employee, 2 = Admin
+        public int RoleId { get; set; } // 2 = Admin
     }
 }

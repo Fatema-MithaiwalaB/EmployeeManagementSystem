@@ -2,7 +2,7 @@
 
 namespace EmployeeManagementSystem.DTOs
 {
-    public class LoginDTO
+    public class EmployeeLoginDTO
     {
         [Required, EmailAddress]
         public string Email { get; set; }
@@ -10,4 +10,5 @@ namespace EmployeeManagementSystem.DTOs
         [Required]
         public string Password { get; set; }
     }
+
 }

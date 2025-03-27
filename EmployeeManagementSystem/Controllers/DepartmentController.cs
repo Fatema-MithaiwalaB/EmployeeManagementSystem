@@ -1,6 +1,4 @@
-﻿using EmployeeManagementSystem.Models;
-using EmployeeManagementSystem.Repository;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementSystem.Controllers
 {

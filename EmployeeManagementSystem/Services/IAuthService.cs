@@ -1,6 +1,6 @@
 ﻿namespace EmployeeManagementSystem.Services
 {
-    public interface IAdminService
+    public interface IAuthService
     {
     }
 }
